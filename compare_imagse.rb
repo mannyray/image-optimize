@@ -38,23 +38,88 @@ html = <<~HTML
   <meta charset="utf-8" />
   <title>Swipe Image Comparison</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; background: #f9f9f9; }
-    img { max-width: 45%; margin: 0 2%; border: 1px solid #ccc; }
-    .image-container { margin: 40px 0; }
-    .instructions { font-size: 18px; margin-bottom: 20px; }
-    .file-info { margin-top: 10px; font-size: 14px; }
-    .done-message { display: none; font-size: 20px; margin-top: 30px; }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: #f9f9f9;
+      user-select: none;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease;
+    }
+    .container {
+      position: relative;
+      width: 90vw;
+      max-width: 900px;
+      margin: 0 auto;
+      height: 500px;
+      overflow: visible;
+    }
+    .image-pair {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 4%;
+      align-items: center;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      cursor: grab;
+    }
+    .image-pair img {
+      max-width: 45%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    }
+    .file-info {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .instructions {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    .done-message {
+      display: none;
+      font-size: 20px;
+      margin-top: 30px;
+    }
+    /* Progress Bar */
+    #progress-container {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 28px;
+      background: #eee;
+      box-shadow: inset 0 0 5px #ccc;
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      font-size: 14px;
+      color: #333;
+      user-select: none;
+    }
+    #progress-bar {
+      height: 8px;
+      background: #4caf50;
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.4s ease;
+      margin-left: 10px;
+      flex-grow: 1;
+    }
   </style>
 </head>
 <body>
   <h1>Swipe Image Comparison</h1>
   <div class="instructions">
-    Press <strong>Space</strong> or <strong>→</strong> to <span style="color:green;">Accept</span>,
-    <strong>X</strong> or <strong>←</strong> to <span style="color:red;">Reject</span>
+    Press <strong>Space</strong> or <strong>→</strong> to <span style="color:green;">Accept</span>,<br/>
+    Press <strong>X</strong> or <strong>←</strong> to <span style="color:red;">Reject</span>
   </div>
 
-  <div id="viewer">
-    <div class="image-container">
+  <div class="container" id="container">
+    <div class="image-pair" id="imagePair">
       <img id="imgA" src="" alt="Original" />
       <img id="imgB" src="" alt="Compressed" />
     </div>
@@ -63,6 +128,11 @@ html = <<~HTML
 
   <div class="done-message" id="doneMessage">
     All images reviewed. Downloading results...
+  </div>
+
+  <div id="progress-container">
+    <div id="progress-text">0 / 0</div>
+    <div id="progress-bar"></div>
   </div>
 
   <script>
@@ -89,41 +159,88 @@ html += <<~HTML
     const imgA = document.getElementById('imgA');
     const imgB = document.getElementById('imgB');
     const info = document.getElementById('info');
-    const viewer = document.getElementById('viewer');
+    const container = document.getElementById('container');
+    const imagePair = document.getElementById('imagePair');
     const doneMessage = document.getElementById('doneMessage');
+    const progressText = document.getElementById('progress-text');
+    const progressBar = document.getElementById('progress-bar');
+    const body = document.body;
+
+    function updateProgress() {
+      progressText.textContent = \`\${current} / \${imagePairs.length}\`;
+      if(imagePairs.length > 0) {
+        progressBar.style.width = ((current / imagePairs.length) * 100) + '%';
+      } else {
+        progressBar.style.width = '0%';
+      }
+    }
 
     function showPair(index) {
+      if (index >= imagePairs.length) return;
       const pair = imagePairs[index];
       imgA.src = pair.a;
       imgB.src = pair.b;
 
       const percent = ((1 - pair.sizeB / pair.sizeA) * 100).toFixed(2);
 
-      info.innerHTML = `
+      info.innerHTML = \`
         <div><strong>\${pair.path}</strong></div>
         <div>Original: \${pair.sizeA} bytes | Compressed: \${pair.sizeB} bytes</div>
         <div>Compression: \${percent}%</div>
-      `;
+      \`;
+
+      // Reset transform & opacity
+      imagePair.style.transition = 'none';
+      imagePair.style.transform = 'translateX(-50%)';
+      imagePair.style.opacity = '1';
+      updateProgress();
+    }
+
+    function flashBackground(color) {
+      body.style.backgroundColor = color;
+      setTimeout(() => {
+        body.style.backgroundColor = '#f9f9f9';
+      }, 300);
+    }
+
+    function animateSwipe(direction, callback) {
+      // direction: 'accept' = right, 'reject' = left
+      imagePair.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+      const offscreenX = direction === 'accept' ? '150vw' : '-150vw';
+      imagePair.style.transform = \`translateX(\${offscreenX})\`;
+      imagePair.style.opacity = '0';
+
+      flashBackground(direction === 'accept' ? '#d4f8d4' : '#f8d4d4'); // Light green or red
+
+      setTimeout(() => {
+        callback();
+      }, 500);
     }
 
     function handleChoice(type) {
-      const pair = imagePairs[current];
-      if (type === 'accepted') {
-        accepted.push(pair.path);
-      } else {
-        rejected.push(pair.path);
-      }
+      if (current >= imagePairs.length) return;
 
-      current++;
-      if (current >= imagePairs.length) {
-        endSession();
-      } else {
-        showPair(current);
-      }
+      const direction = (type === 'accepted') ? 'accept' : 'reject';
+
+      animateSwipe(direction, () => {
+        const pair = imagePairs[current];
+        if (type === 'accepted') {
+          accepted.push(pair.path);
+        } else {
+          rejected.push(pair.path);
+        }
+
+        current++;
+        if (current >= imagePairs.length) {
+          endSession();
+        } else {
+          showPair(current);
+        }
+      });
     }
 
     function endSession() {
-      viewer.style.display = 'none';
+      container.style.display = 'none';
       doneMessage.style.display = 'block';
 
       setTimeout(() => {
@@ -152,8 +269,8 @@ html += <<~HTML
 
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Space' || e.code === 'ArrowRight') {
-        handleChoice('accepted');
         e.preventDefault();
+        handleChoice('accepted');
       } else if (e.key.toLowerCase() === 'x' || e.code === 'ArrowLeft') {
         handleChoice('rejected');
       }
@@ -163,12 +280,12 @@ html += <<~HTML
       showPair(0);
     } else {
       info.textContent = 'No image pairs found.';
+      progressText.textContent = '0 / 0';
     }
   </script>
 </body>
 </html>
 HTML
 
-# Write output file
 File.write(output_html, html)
 puts "✅ Swipe-based HTML review generated: #{output_html}"
