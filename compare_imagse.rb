@@ -5,6 +5,7 @@ require 'json'
 dir_a = './test_site/assets'  # Original images directory
 dir_b = './test_site/_site/assets'  # Compressed images directory
 
+
 output_html = "swipe_compare_#{Time.now.strftime('%Y%m%d_%H%M%S')}.html"
 extensions = ['.jpg', '.jpeg', '.png', '.gif']
 
@@ -38,39 +39,59 @@ html = <<~HTML
   <meta charset="utf-8" />
   <title>Swipe Image Comparison</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-      background: #f9f9f9;
-      user-select: none;
-      overflow-x: hidden;
-      transition: background-color 0.3s ease;
-    }
-    .container {
-      width: 90vw;
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-    .image-pair {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 4%;
-      align-items: center;
-      transition: transform 0.5s ease, opacity 0.5s ease;
-      cursor: grab;
-    }
-    .image-pair img {
-      max-width: 45%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: sans-serif;
+  text-align: center;
+  padding: 20px;
+  background: #f9f9f9;
+  user-select: none;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease;
+}
+
+.container {
+  width: 95vw;          /* Use most of viewport width */
+  max-width: 1200px;    /* Max width to keep it manageable */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.image-pair {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2%;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  cursor: grab;
+}
+
+.image-pair img {
+  width: 48%;      /* Close to half width */
+  max-width: none;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.arrow {
+  font-size: 3rem;
+  color: #666;
+  user-select: none;
+  pointer-events: none;
+}
+
     .file-info {
       font-size: 14px;
     }
@@ -116,6 +137,7 @@ html = <<~HTML
   <div class="container" id="container">
     <div class="image-pair" id="imagePair">
       <img id="imgA" src="" alt="Original" />
+      <div class="arrow">→</div>
       <img id="imgB" src="" alt="Compressed" />
     </div>
     <div class="file-info" id="info"></div>
@@ -134,7 +156,7 @@ html = <<~HTML
     const imagePairs = [
 HTML
 
-# Add JS objects for each image pair
+# Add image pair data as JS array
 image_pairs.each do |pair|
   html += "      #{{
     a: pair[:file_a],
