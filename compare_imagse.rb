@@ -48,17 +48,15 @@ html = <<~HTML
       transition: background-color 0.3s ease;
     }
     .container {
-      position: relative;
       width: 90vw;
       max-width: 900px;
       margin: 0 auto;
-      height: 500px;
-      overflow: visible;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
     }
     .image-pair {
-      position: absolute;
-      top: 0; left: 50%;
-      transform: translateX(-50%);
       width: 100%;
       display: flex;
       justify-content: center;
@@ -74,7 +72,6 @@ html = <<~HTML
       box-shadow: 0 2px 10px rgba(0,0,0,0.15);
     }
     .file-info {
-      margin-top: 10px;
       font-size: 14px;
     }
     .instructions {
@@ -137,6 +134,7 @@ html = <<~HTML
     const imagePairs = [
 HTML
 
+# Add JS objects for each image pair
 image_pairs.each do |pair|
   html += "      #{{
     a: pair[:file_a],
@@ -168,8 +166,6 @@ html += <<~HTML
       progressText.textContent = `${current} / ${imagePairs.length}`;
       if (imagePairs.length > 0) {
         const widthPercent = (current / imagePairs.length) * 100;
-        console.log("ggg");
-        console.log(widthPercent);
         progressBar.style.width = widthPercent + '%';
       } else {
         progressBar.style.width = '0%';
@@ -191,7 +187,7 @@ html += <<~HTML
       `;
 
       imagePair.style.transition = 'none';
-      imagePair.style.transform = 'translateX(-50%)';
+      imagePair.style.transform = 'translateX(0%)';
       imagePair.style.opacity = '1';
       updateProgress();
     }
