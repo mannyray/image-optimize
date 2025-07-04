@@ -8,7 +8,7 @@ dir_b = './test_site/_site/assets'  # Compressed images directory
 output_html = "swipe_compare_#{Time.now.strftime('%Y%m%d_%H%M%S')}.html"
 extensions = ['.jpg', '.jpeg', '.png', '.gif']
 
-# Collect valid image pairs
+# --- COLLECT IMAGE PAIRS ---
 image_pairs = []
 Dir.glob("#{dir_a}/**/*").each do |file_a|
   next unless File.file?(file_a)
@@ -30,7 +30,7 @@ Dir.glob("#{dir_a}/**/*").each do |file_a|
   }
 end
 
-# Start HTML
+# --- GENERATE HTML ---
 html = <<~HTML
 <!DOCTYPE html>
 <html>
@@ -86,7 +86,6 @@ html = <<~HTML
       font-size: 20px;
       margin-top: 30px;
     }
-    /* Progress Bar */
     #progress-container {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -107,7 +106,6 @@ html = <<~HTML
       width: 0%;
       transition: width 0.4s ease;
       margin-left: 10px;
-      flex-grow: 1;
     }
   </style>
 </head>
@@ -167,9 +165,12 @@ html += <<~HTML
     const body = document.body;
 
     function updateProgress() {
-      progressText.textContent = \`\${current} / \${imagePairs.length}\`;
-      if(imagePairs.length > 0) {
-        progressBar.style.width = ((current / imagePairs.length) * 100) + '%';
+      progressText.textContent = `${current} / ${imagePairs.length}`;
+      if (imagePairs.length > 0) {
+        const widthPercent = (current / imagePairs.length) * 100;
+        console.log("ggg");
+        console.log(widthPercent);
+        progressBar.style.width = widthPercent + '%';
       } else {
         progressBar.style.width = '0%';
       }
@@ -183,13 +184,12 @@ html += <<~HTML
 
       const percent = ((1 - pair.sizeB / pair.sizeA) * 100).toFixed(2);
 
-      info.innerHTML = \`
-        <div><strong>\${pair.path}</strong></div>
-        <div>Original: \${pair.sizeA} bytes | Compressed: \${pair.sizeB} bytes</div>
-        <div>Compression: \${percent}%</div>
-      \`;
+      info.innerHTML = `
+        <div><strong>${pair.path}</strong></div>
+        <div>Original: ${pair.sizeA} bytes | Compressed: ${pair.sizeB} bytes</div>
+        <div>Compression: ${percent}%</div>
+      `;
 
-      // Reset transform & opacity
       imagePair.style.transition = 'none';
       imagePair.style.transform = 'translateX(-50%)';
       imagePair.style.opacity = '1';
@@ -204,13 +204,12 @@ html += <<~HTML
     }
 
     function animateSwipe(direction, callback) {
-      // direction: 'accept' = right, 'reject' = left
       imagePair.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
       const offscreenX = direction === 'accept' ? '150vw' : '-150vw';
-      imagePair.style.transform = \`translateX(\${offscreenX})\`;
+      imagePair.style.transform = `translateX(${offscreenX})`;
       imagePair.style.opacity = '0';
 
-      flashBackground(direction === 'accept' ? '#d4f8d4' : '#f8d4d4'); // Light green or red
+      flashBackground(direction === 'accept' ? '#d4f8d4' : '#f8d4d4');
 
       setTimeout(() => {
         callback();
@@ -276,6 +275,9 @@ html += <<~HTML
       }
     });
 
+    // Init
+    current = 0;
+    progressBar.style.width = '0%';
     if (imagePairs.length > 0) {
       showPair(0);
     } else {
