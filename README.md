@@ -26,9 +26,9 @@ Now comparing to the average is not necessarily appropriate as sometimes the ave
 
 Now the previous, 1950s, gold weight standard is more accetable as a "gold" standard as humans have not evolved that much over the past three quarters of a century since. It's not as if we all grew an extra pair of legs to justify the weight bump to 191-199 pounds (we did, on average, grow a few inches taller though). Most people, without any need for citations, will agree that it all has something to do with us eating way too much and so optimizing food consumption is logical.
 
-It may not be as logical for the case of the average `3Mb` and web technology in general. Unlike, humans, computer and internet tech has experienced a massive evolution over the decades and so maybe `3Mb` is good enough? Phones and computers haven't grown a pair of legs (yet), but they are orders of magnitude faster and so maybe strong inflation (from `1Mb` in 2012) in webpage size is _okay_ as long as people can still see their social media feed and it all works... Furthemore, unlike most humans looking similar to each other, most web pages do not - some are plain text based sites while some are photo galleries - the variation adds flexibility to how we interpret what an appropriate average is for each of them.
+It may not be as logical for the case of the average web page `3Mb` and web technology in general. Unlike, humans, computer and internet tech has experienced a massive evolution over the decades and so maybe `3Mb` is good enough? Phones and computers haven't grown a pair of legs (yet), but they are orders of magnitude faster and so maybe strong inflation (from `1Mb` in 2012) in webpage size is _okay_ as long as people can still see their social media feed and it all works... Furthemore, unlike most humans looking similar to each other, most web pages do not - some are plain text based sites while some are photo galleries - the variation adds flexibility to how we interpret what an appropriate average is for each of them.
 
-No matter what the end average will be for my web pages, I think it is still worth practicing optimizing for the sake of optimization and beauty. The advanced tech and fast internet speeds may be forgiving for my sloppy web pages, but I will see if I can improve.
+No matter what the end average size will be for my web pages, I think it is still worth practicing optimizing for the sake of optimization and beauty. The advanced tech and fast internet speeds may be forgiving for my sloppy web pages, but I will see if I can improve.
 
 Delivering a web page or any other product to a consumer that is optimized changes your approach to the product - you end up making it with more "love". Even if the consumer can't notice the difference with the end product, working on optimizing and making it better, changes your approach to it and your future endevours. Putting the effort in optimizing increases your "ownership" of the product and similar to owning your property (versus renting), you end up caring for the product more. 
 
@@ -86,7 +86,7 @@ The original, left hand side, `3.3Mb` file gets shrunk `10%` ~ a `0.16Mb` file. 
 convert <INPUT_FILE> -quality 10% <OUTPUT_FILE>
 ```
 
-on a folder containing the pepper image _and_ the wall image would give me one picture I am satisfied with and one I am not. Therefore, running the bash command blindly is not sufficient - we need to visually verify if the optimization is ideal or not for each image. How do we do that? How do I do that on my website? First we will take an aside and learn about on the specifics of my site.
+on a folder containing the pepper image _and_ the wall image would give me one picture I am satisfied with and one I am not. Therefore, running the bash command blindly is not sufficient - we need to visually verify if the optimization is ideal or not for each image. How do we do that? How do I do that on my website? First we will take an aside and learn about the specifics of my site.
 
 ## Jekyll site aside
 
@@ -110,7 +110,7 @@ The vanilla website can be considered as a specific car factory's model or theme
 
 After your website is built via the Jekyll tool then it is equivalent to driving anywhere you want with your car. The Jekyll tool doesn't care what you do with your website or write on it just as the car factory doesn't really care how and where you drive.
 
-Regardless of what model your car is, Jekyll designed all the themes / car-models such that it is very simple and standard to add-content / drive. Driving in one car model is basically the same in another car-model. This is what makes Jekyll attractive as the adding-content / driving is very similar while the themes / car/models can be very different. A Jekyll user can easily find a car of their flavour and drive where they want.
+Regardless of what model your car is, Jekyll designed all the themes / car-models such that it is very simple and standard to add-content / drive. Driving in one car model is basically the same in another car-model. This is what makes Jekyll attractive as the adding-content / driving is very similar while the themes / car-models can be very different. A Jekyll user can easily find a car of their flavour and drive where they want.
 
 Social media websites are also similar to site generating tool like Jekyll as in the adding-content / driving mechanics are very straightforward. Whether you are making a post, or sharing pictures - these concepts are very standard and easy to pick up from facebook, twitter and others. For the analogy, if Jekyll is a car factory then social media websites are public transport - simple and easy to use and get around town but are restricted by the routes (like Twitter with character count in tweets) and you are subject to seeing advertisement and interacting with other passengers.
 
@@ -234,7 +234,7 @@ The reason we distinguish between `accepted` and `not accepted` is that we alrea
 
 ![](assets/first_attempt.png)
 
-We can now go to step 1 of this guide and modify `script/settings.rb` to a higher setting of `20` instead of `5` in hopes that the optimized wall image will be more wall like and less like a contour map. 
+We can now go to step 1 of this guide and modify `script/settings.rb` to a higher setting of `15` instead of `5` in hopes that the optimized wall image will be more wall like and less like a contour map. 
 ```ruby
     :jpegoptim=>
     {
@@ -256,11 +256,11 @@ Done.
 > mv ~/Downloads/results.txt ~/test_folder_backup/results.txt
 ```
 
-After setting to `20` we got a better result as seen below which in this case we will choose to accept 
+After setting to `15` we got a better result hatn before as seen in the image below which in this case we will choose to accept 
 
 ![](assets/second_attempt.png)
 
-The idea of iteration is that you first start with the lowest possible `:max_quality =>` setting in `script/settings.rb` and accept all images that under that quality look acceptable to the eye. Then you keep increasing the `:max_quality =>` to get the rest of the images that don't. This is a greedy approach because by starting at the lowest `:max_quality =>` you try to compress as much as possible until the optimized images looks good.
+The idea of iteration is that you first start with the lowest possible `:max_quality =>` setting in `script/settings.rb` and accept all images that under that quality look acceptable to the eye. Then you keep increasing the `:max_quality =>` to get the rest of the images that don't. This is a greedy approach because by starting at the lowest `:max_quality =>` you try to compress as much as possible until the optimized images look good.
 
 The file `results.txt`, stored in the `_backup` directory, acts as a checkpoint of your results so that you can pause and come back later. Furthermore, if you end up adding new images to your folder sometime in the future then you can repeat the process without revisiting the already optimized images.
 
@@ -268,7 +268,7 @@ The file `results.txt`, stored in the `_backup` directory, acts as a checkpoint 
 
 Despite the long and fancy write up of this README, the series of scripts presented in this repository are simply used to reduce the size of a bunch of files on a hard drive: nothing fancy. As someone who has been coding for over a decade this is a very basic task that fits into the general category of computer programming housekeeping: move some files here, transform some files over there and delete some files elsewhere. What separates this specific set of scripts is how I generated them.
 
-Each of the ruby scripts were generated via chatgpt over the course of 10 minutes of back and forth iteration of the script. The ruby script that generated the comparison tool `compare_images.rb` was very impressive for me as it allowed me to create a beautiful tool in assiting in the boring task of verifying that the optimization quality is good. If you had asked me to optimize my images a few years ago, I would probably push back and say "is it worth the development time of the app?"." However, now that development time is being reduced so drastictly - it's an easy "let's do it".
+Each of the ruby scripts were generated via chatgpt over the course of 10 minutes of back and forth chatting with the AI bot to produce the exact script I need. The ruby script that generated the comparison tool `compare_images.rb` was very impressive for me as it allowed me to create a beautiful tool in assiting in the boring task of verifying that the optimization quality is good. If you had asked me to optimize my images a few years ago, I would probably have pushed back and said: "is it worth the development time of the app?"." However, now that development time is being reduced so drastictly - it's an easy "let's do it".
 
 I did develop a similar comparison/analysis tool (without chatgpt) years prior - https://github.com/mannyray/ImageTagger and the development was slow as I wasn't an expert in UI. I'm still not a UI expert, but that is no longer that important. Even with languages I was more expert in, I still had to do a lot of remembering in the past like "hey...how do I open a file in python again?" and after googling, stackoverflow.com would let me know it's:
 
