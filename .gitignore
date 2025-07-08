@@ -1,1 +1,3 @@
 *.DS_Store
+scripts/analyse_results/*
+test_folder_backup/*
